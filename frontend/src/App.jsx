@@ -1,16 +1,24 @@
 import { Routes, Route } from 'react-router-dom'
 import HeroSection from './pages/HeroSection'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
+import Authentication from './pages/Authentication'
+import { Toaster } from 'react-hot-toast'
+import VideoMeet from './pages/VideoMeet'
 
 const App = () => {
   return (
     <>
       <Routes>
         <Route path="/" element={<HeroSection />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/authentication" element={<Authentication />} />
+        <Route path="/meeting" element={<VideoMeet />} />
       </Routes>
+
+
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+      />
+
     </>
   )
 }

@@ -1,0 +1,30 @@
+<svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="50 50 50 50"
+        className="w-8 h-8 drop-shadow-lg"
+      >
+
+        {/* Video Camera Outline */}
+        <path
+          d="M 18 35 C 18 31 21 28 25 28 L 65 28 C 69 28 72 31 72 35 L 72 65 C 72 69 69 72 65 72 L 25 72 C 21 72 18 69 18 65 Z"
+          fill="#0a0710"
+          stroke="#f27e20"
+          strokeOpacity="0.4"
+          strokeWidth="2"
+        />
+        <path
+          d="M 72 45 L 86 36 C 88 34 90 36 90 38 L 90 62 C 90 64 88 66 86 64 L 72 55"
+          fill="#0a0710"
+          stroke="#f27e20"
+          strokeOpacity="0.4"
+          strokeWidth="2"
+          strokeLinejoin="round"
+        />
+
+        {/* Text "AG" */}
+        <text x="30" y="59" fontFamily="sans-serif" fontSize="100" fontWeight="900" textAnchor="end" fill="#ffffff" letterSpacing="-2">A</text>
+        <text x="40" y="59" fontFamily="sans-serif" fontSize="100" fontWeight="900" textAnchor="start" fill="#f27e20" letterSpacing="-2">V</text>
+
+        {/* Little Red Recording Dot */}
+        <circle cx="26" cy="36" r="3" fill="#ef4444" />
+      </svg>

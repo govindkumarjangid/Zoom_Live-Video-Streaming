@@ -1,0 +1,37 @@
+import React, { useContext } from "react";
+
+const AuthContext = React.createContext();
+
+export const useAuth = () => {
+    return useContext(AuthContext);
+}
+
+export const AuthContextProvider = ({ children }) => {
+
+    const user = null;
+    const [formState, setFormState] = React.useState('login');
+
+
+    const toastStyle = {
+        style: {
+            borderRadius: '10px',
+            background: '#0D0716',
+            color: '#fff',
+            border: '1px solid #f27e20',
+        },
+    }
+
+    const authValue = {
+        user,
+        formState,
+        setFormState,
+        toastStyle
+
+    };
+
+    return (
+        <AuthContext.Provider value={authValue}>
+            {children}
+        </AuthContext.Provider>
+    );
+}

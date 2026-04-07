@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion';
 import { MicOff, Video, PhoneOff, Settings, FlipHorizontal, Volume2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 const Hero = () => {
 
     const naviagte = useNavigate();
+    const { setFormState } = useAuth();
 
     return (
         <main className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 md:px-12 flex flex-1 gap-6 md:gap-12 items-center justify-center flex-col-reverse md:flex-row h-full pb-8 md:py-0 overflow-hidden">
@@ -31,7 +33,10 @@ const Hero = () => {
                 </motion.p>
 
                 <motion.button
-                    onClick={() => naviagte('/register')}
+                    onClick={() => {
+                        setFormState('register');
+                        naviagte('/authentication');
+                    }}
                     initial={{ opacity: 0, y: 50, blur: "10px" }}
                     animate={{ opacity: 1, y: 0, blur: "0px" }}
                     transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
