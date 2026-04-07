@@ -2,9 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { createServer } from 'node:http';
-import connectDB from './configs/connectDB.js';
-import { initilizeSocketServer } from './configs/connectSocket.js';
-import UserRouter from './routes/user.routes.js';
+import connectDB from './src/configs/connectDB.js';
+import { initilizeSocketServer } from './src/configs/connectSocket.js';
+import UserRouter from './src/routes/user.routes.js';
 
 dotenv.config();
 
