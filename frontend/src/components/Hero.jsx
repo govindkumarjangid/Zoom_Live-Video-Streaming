@@ -8,35 +8,28 @@ import toast from 'react-hot-toast';
 const Hero = () => {
 
     const naviagte = useNavigate();
-    const { setFormState } = useAuth();
+    const { setFormState, toastStyle } = useAuth();
     const [meetingCode, setMeetingCode] = useState('');
 
     const handleJoinAsGuest = () => {
         if (!meetingCode.trim()) {
-            toast.error('Please enter a meeting code first', {
-                style: {
-                    borderRadius: '10px',
-                    background: '#32303A',
-                    color: '#f1f2f3',
-                    border: '1px solid #f27e20',
-                },
-            });
+            toast.error('Please enter a meeting code first', toastStyle);
             return;
         }
         naviagte(`/${meetingCode}`);
     };
 
     return (
-        <main className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 md:px-12 flex flex-1 gap-6 md:gap-12 items-center justify-center flex-col-reverse md:flex-row h-full pb-8 md:py-0 overflow-hidden">
+        <main className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 md:px-12 flex flex-1 gap-0 md:gap-12 items-center justify-center flex-col-reverse md:flex-row h-full pt-10 md:py-0 overflow-y-auto md:overflow-hidden">
 
             {/* Left Column*/}
-            <div className="flex flex-col items-start space-y-6 md:w-1/2 w-full "
+            <div className="flex flex-col items-start space-y-6 md:w-1/2 w-full mt-4 md:mt-0"
             >
                 <motion.h1
                     initial={{ opacity: 0, y: 50, blur: "10px" }}
                     animate={{ opacity: 1, y: 0, blur: "0px" }}
                     transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-                    className="text-4xl md:text-5xl font-semibold leading-tight text-gray-100"
+                    className="text-3xl md:text-5xl font-semibold leading-tight text-gray-100"
                 >
                     Seamless <span className="text-[#f27e20]">Video Calls</span> <br />
                     Anywhere, Anytime
@@ -88,7 +81,7 @@ const Hero = () => {
                         initial={{ opacity: 0, y: 50, blur: "10px" }}
                         animate={{ opacity: 1, y: 0, blur: "0px" }}
                         transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
-                        className="w-full bg-[#f27e20] hover:bg-[#d96c16] text-white px-8 py-3 rounded-lg font-medium text-lg shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                        className="w-full bg-[#f27e20] hover:bg-[#d96c16] text-white px-8 py-3 rounded-lg font-medium text-lg shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer mb-20 md:mb-0"
                     >
                         Get Started Free
                     </motion.button>
@@ -96,14 +89,14 @@ const Hero = () => {
             </div>
 
             {/* Right Column: Phone Mockups */}
-            <div className="relative h-full w-full md:w-1/2 flex justify-center items-center perspective-1000 scale-[0.65] sm:scale-75 md:scale-[0.85] lg:scale-100 origin-center md:origin-right lg:origin-center sm:mt-0">
+            <div className="relative min-h-112.5 sm:min-h-125 md:min-h-0 h-full w-full md:w-1/2 flex justify-center items-center perspective-1000 scale-[0.70] sm:scale-[0.80] md:scale-[0.85] lg:scale-100 origin-top md:origin-right lg:origin-center sm:my-0 lg:ml-12 mt-8">
 
                 {/* Back Phone (Right) */}
                 <motion.div
                     initial={{ opacity: 0, x: 100, rotate: 15 }}
                     animate={{ opacity: 1, x: 40, rotate: 8 }}
                     transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-                    className="absolute z-0 w-60 h-125 rounded-[2.5rem] bg-gray-900 border-4 border-gray-800 shadow-2xl overflow-hidden"
+                    className="absolute z-0 w-60 sm:w-64 h-120 sm:h-125 rounded-[2.5rem] bg-gray-900 border-4 border-gray-800 shadow-2xl overflow-hidden"
                 >
                     <img
                         src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=600&auto=format&fit=crop" alt="Video caller 2"
@@ -133,7 +126,7 @@ const Hero = () => {
                     initial={{ opacity: 0, x: -100, y: 50, rotate: -15 }}
                     animate={{ opacity: 1, x: -60, y: 20, rotate: -6 }}
                     transition={{ duration: 1, ease: "easeOut" }}
-                    className="absolute z-10 w-65 h-135 rounded-[2.5rem] bg-black border-[6px] border-gray-800 shadow-2xl overflow-hidden"
+                    className="absolute z-10 w-65 sm:w-70 h-130 sm:h-135 rounded-[2.5rem] bg-black border-[6px] border-gray-800 shadow-2xl overflow-hidden"
                 >
                     <motion.div className="w-full h-full relative">
                         <img

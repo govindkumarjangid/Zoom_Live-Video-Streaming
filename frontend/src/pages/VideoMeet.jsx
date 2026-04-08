@@ -702,7 +702,7 @@ const VideoMeet = () => {
                   return (
                     <div className={`flex w-full ${isMe ? 'justify-end' : 'justify-start'}`} key={index}>
                       <div className={`max-w-[75%] px-4 py-2 shadow-sm ${isMe ? 'bg-[#f27e20] text-white rounded-2xl rounded-tr-sm' : 'bg-white/10 border border-white/10 text-white rounded-2xl rounded-tl-sm'}`}>
-                        <p className="text-[15px] leading-relaxed break-words">{item.data}</p>
+                        <p className="text-[15px] leading-relaxed wrap-break-words">{item.data}</p>
                       </div>
                     </div>
                   )

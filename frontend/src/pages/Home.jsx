@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import WithAuth from '../utils/WithAuth.jsx';
 import { useNavigate } from 'react-router-dom';
-import { Clock, LogOut } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Clock, LogOut, Menu, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import BgGlowingEffect from '../components/BgGlowingEffect';
 import { useHistory } from '../context/HistoryContext.jsx';
 import toast from 'react-hot-toast';
@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 const Home = () => {
 
   const [meetingCode, setMeetingCode] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -43,22 +44,22 @@ const Home = () => {
       <BgGlowingEffect />
 
       {/* Navbar Section */}
-      <header className="relative z-10 w-full flex items-center justify-between px-8 md:px-16 py-6 shrink-0">
+      <header className="relative z-50 w-full flex items-center justify-between px-6 md:px-16 py-6 shrink-0">
         {/* Top Left: Logo / Brand Name */}
         <motion.div
-          initial={{ opacity: 0, y: -50, blur: "10px" }}
-          animate={{ opacity: 1, y: 0, blur: "0px" }}
+          initial={{ opacity: 0, y: -50, filter: "blur(10px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-          className="text-xl font-semibold tracking-wide text-gray-100">
+          className="text-xl font-bold tracking-wide text-transparent bg-clip-text bg-linear-to-r from-orange-400 to-[#f27e20]">
           Apna Video Call
         </motion.div>
 
-        {/* Top Right: History and Logout */}
+        {/* Desktop Menu */}
         <motion.div
-          initial={{ opacity: 0, y: -50, blur: "10px" }}
-          animate={{ opacity: 1, y: 0, blur: "0px" }}
+          initial={{ opacity: 0, y: -50, filter: "blur(10px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-          className="flex items-center gap-6">
+          className="hidden md:flex items-center gap-6">
           <button
             onClick={() => navigate('/history')}
             className="flex items-center gap-2 text-gray-300 hover:text-white transition-all duration-150 active:scale-95 text-sm font-medium cursor-pointer">
@@ -72,27 +73,77 @@ const Home = () => {
             LOGOUT
           </button>
         </motion.div>
+
+        {/* Mobile Menu Toggle Button */}
+        <motion.div
+          initial={{ opacity: 0, y: -50, filter: "blur(10px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+          className="md:hidden flex items-center"
+        >
+          <button
+             onClick={() => setIsMenuOpen(!isMenuOpen)}
+             className="text-gray-300 hover:text-white focus:outline-none transition-colors z-50 cursor-pointer"
+          >
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </motion.div>
       </header>
+
+      {/* Mobile Full-Screen Menu Overlay */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="absolute h-screen w-full z-40 bg-[#050308]/95 backdrop-blur-xl flex flex-col items-center justify-center gap-8 md:hidden"
+          >
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                navigate('/history');
+              }}
+              className="flex items-center gap-3 text-2xl text-gray-200 hover:text-[#f27e20] transition-colors"
+            >
+              <Clock size={28} />
+              History
+            </button>
+
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                handleLogout();
+              }}
+              className="flex items-center gap-3 text-2xl text-gray-200 hover:text-red-500 transition-colors"
+            >
+              <LogOut size={28} />
+              Logout
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content Section */}
       <main className="relative z-10 flex-1 flex flex-col md:flex-row items-center justify-center px-8 md:px-24">
 
         {/* Left Column: Text and Input Form */}
-        <div className="w-full md:w-1/2 flex flex-col items-start space-y-6">
+        <div className="w-full md:w-1/2 flex flex-col items-start space-y-6 z-10">
           <motion.h1
-            initial={{ opacity: 0, y: 50, blur: "10px" }}
-            animate={{ opacity: 1, y: 0, blur: "0px" }}
+            initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-            className="text-3xl md:text-5xl font-semibold leading-tight max-w-lg text-gray-100">
+            className="text-3xl mt-20 md:mt-0 md:text-5xl font-semibold leading-tight max-w-lg text-gray-100">
             Providing Quality <span className="text-[#f27e20]">Video Calls</span> Just Like Quality Education
           </motion.h1>
 
           <motion.div
-            initial={{ opacity: 0, y: 50, blur: "10px" }}
-            animate={{ opacity: 1, y: 0, blur: "0px" }}
+            initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
             className="flex flex-col gap-4 w-full max-w-md mt-4">
-            <div className="flex items-center gap-3 w-full">
+            <div className="flex items-center md:flex-row flex-col gap-3 w-full">
               <input
                 type="text"
                 placeholder="Meeting Code"
@@ -103,7 +154,7 @@ const Home = () => {
               />
               <button
                 onClick={handleJoinVideoCall}
-                className="bg-[#f27e20] hover:bg-[#d96c16] text-white font-medium px-8 py-3 rounded-md transition-all duration-100 hover:scale-105 active:scale-97 shadow-lg cursor-pointer">
+                className="bg-[#f27e20] hover:bg-[#d96c16] text-white font-medium px-8 py-3 rounded-md transition-all duration-100 hover:scale-105 active:scale-97 shadow-lg cursor-pointer w-full md:w-auto">
                 JOIN
               </button>
             </div>
@@ -127,10 +178,10 @@ const Home = () => {
         </div>
 
         {/* Right Column: Illustration */}
-        <div className="w-full md:w-1/2 flex justify-center items-center mt-12 md:mt-0">
+        <div className="w-full md:w-1/2 flex justify-center items-center mt-12 md:mt-0 z-10">
           <motion.div
-            initial={{ opacity: 0, x: 50, blur: "10px" }}
-            animate={{ opacity: 1, x: 0, blur: "0px" }}
+            initial={{ opacity: 0, x: 50, filter: "blur(10px)" }}
+            animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
             transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
             className="relative w-full max-w-sm">
             <img

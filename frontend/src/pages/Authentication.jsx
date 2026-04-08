@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, UserPlus, User, LogIn, Loader } from 'lucide-react';
+import { Mail, Lock, UserPlus, User, LogIn, Loader, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import axiosInstance from '../utils/axiosInstance.js';
 import { toast } from 'react-hot-toast';
@@ -53,7 +53,8 @@ const Authentication = () => {
     }
 
     return (
-        <div className="min-h-screen w-full flex bg-[#050308] text-white overflow-hidden">
+        <div className="min-h-screen w-full flex bg-[#050308] text-white overflow-y-hidden relative">
+
             {/* Left Side: Image */}
 
             <div className="hidden md:flex md:w-1/2 relative bg-gray-900">
@@ -83,7 +84,7 @@ const Authentication = () => {
             </div>
 
             {/* Right Side: Form */}
-            <div className="w-full md:w-1/2 flex items-center justify-center p-8 sm:p-12 relative">
+            <div className="w-full md:w-1/2 flex items-center justify-center p-8 sm:p-12 relative overflow-hidden">
 
                 {/* Background Glows matching the Hero theme */}
                 <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-[radial-gradient(circle,rgba(120,60,210,0.15)_0%,transparent_80%)] pointer-events-none" />
@@ -97,9 +98,20 @@ const Authentication = () => {
                 >
                     {/* Header */}
                     <div className="mb-10 text-center md:text-left">
-                        <Link to="/" className="inline-block text-[#f27e20] text-2xl font-bold tracking-wide mb-8 hover:text-white transition-colors">
-                            Apna Video Call
-                        </Link>
+                        <div className="flex items-center justify-between gap-4 mb-8">
+                            <motion.button
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.5 }}
+                                onClick={() => naviagte('/')}
+                                className="flex items-center justify-center p-2 rounded-full bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 text-gray-300 hover:text-white transition-all cursor-pointer"
+                            >
+                                <ArrowLeft size={20} />
+                            </motion.button>
+                            <Link to="/" className="text-[#f27e20] text-2xl font-bold tracking-wide hover:text-white transition-colors">
+                                Apna Video Call
+                            </Link>
+                        </div>
                         <h1 className="text-3xl font-bold tracking-tight mb-2">
                             {formState === 'login' ? 'Welcome Back!' : 'Create an Account'}
                         </h1>

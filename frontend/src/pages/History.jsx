@@ -35,41 +35,41 @@ const History = () => {
             <BgGlowingEffect />
 
             {/* Header Section */}
-            <header className="relative z-10 w-full flex items-center justify-between px-8 md:px-16 py-6 shrink-0 border-b border-white/5 bg-[#050308]/60 backdrop-blur-md">
+            <header className="relative z-10 w-full flex items-center justify-between px-4 md:px-16 py-4 md:py-6 shrink-0 border-b border-white/5 bg-[#050308]/60 backdrop-blur-md">
                 <motion.button
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5 }}
-                    onClick={() => navigate('/home')}
-                    className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors cursor-pointer"
+                    onClick={() => navigate(-1)}
+                    className="flex items-center justify-center gap-2 p-2.5 md:p-0 rounded-full md:rounded-none bg-white/5 md:bg-transparent border md:border-none border-white/10 text-gray-300 hover:text-[#f27e20] md:hover:text-white transition-all cursor-pointer shadow-md md:shadow-none"
                 >
-                    <ArrowLeft size={20} />
-                    <span>Back to Home</span>
+                    <ArrowLeft size={22} className="md:w-5 md:h-5" />
+                    <span className="hidden md:inline font-medium text-base">Back to Home</span>
                 </motion.button>
 
                 <motion.h1
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
-                    className="text-2xl font-semibold tracking-wide text-white"
+                    className="text-lg sm:text-xl md:text-2xl font-semibold tracking-wide text-white"
                 >
                     Meeting <span className="text-[#f27e20]">History</span>
                 </motion.h1>
-                <div className="w-24"></div> {/* Spacer for alignment */}
+                <div className="hidden md:block w-30"></div> {/* Spacer for alignment */}
             </header>
 
             {/* Main Content */}
-            <main className="relative z-10 flex-1 w-full mx-auto px-6 py-10 overflow-y-auto">
+            <main className="relative z-10 flex-1 w-full mx-auto px-4 md:px-6 py-6 md:py-10 overflow-y-auto">
                 {!history || history.length === 0 ? (
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5 }}
-                        className="flex flex-col items-center justify-center pt-20 text-gray-400 max-w-4xl mx-auto"
+                        className="flex flex-col items-center justify-center pt-20 text-gray-400 max-w-4xl mx-auto text-center"
                     >
                         <Video size={64} className="mb-4 text-white/20" />
                         <h2 className="text-xl font-medium text-gray-300">No meeting history found</h2>
-                        <p className="mt-2 text-sm">Join a meeting to see it listed here.</p>
+                        <p className="mt-2 text-sm px-4">Join a meeting to see it listed here.</p>
                     </motion.div>
                 ) : (
                     <div className="flex flex-col gap-4 pb-8 max-w-4xl mx-auto">
@@ -79,22 +79,22 @@ const History = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.4, delay: (index % 5) * 0.05 }}
-                                className="flex items-center justify-between bg-[#120e1a]/80 border border-white/10 rounded-xl p-5 hover:border-[#f27e20]/50 transition-colors backdrop-blur-sm shadow-md w-full cursor-pointer"
+                                className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#120e1a]/80 border border-white/10 rounded-xl p-4 sm:p-5 hover:border-[#f27e20]/50 transition-colors backdrop-blur-sm shadow-md w-full gap-4 sm:gap-0 cursor-pointer"
                             >
-                                <div className="flex items-center gap-5">
-                                    <div className="w-12 h-12 rounded-full bg-[#f27e20]/20 flex items-center justify-center border border-[#f27e20]/30 text-[#f27e20]">
+                                <div className="flex items-center gap-4 sm:gap-5 w-full">
+                                    <div className="w-12 h-12 shrink-0 rounded-full bg-[#f27e20]/20 flex items-center justify-center border border-[#f27e20]/30 text-[#f27e20]">
                                         <Video size={24} />
                                     </div>
-                                    <div className="flex flex-col">
-                                        <h3 className="text-lg font-medium text-white mb-1">
+                                    <div className="flex flex-col flex-1 overflow-hidden">
+                                        <h3 className="text-base sm:text-lg font-medium text-white mb-1 truncate">
                                             Code: <span className="text-gray-300 font-normal">{meeting.meetingCode}</span>
                                         </h3>
-                                        <div className="flex items-center gap-4 text-sm text-gray-400">
-                                            <span className="flex items-center gap-1.5">
+                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-400">
+                                            <span className="flex items-center gap-1.5 bg-white/5 sm:bg-transparent px-2.5 sm:px-0 py-1 sm:py-0 rounded-md">
                                                 <Calendar size={14} />
                                                 {formatDate(meeting.createdAt || meeting.date)}
                                             </span>
-                                            <span className="flex items-center gap-1.5">
+                                            <span className="flex items-center gap-1.5 bg-white/5 sm:bg-transparent px-2.5 sm:px-0 py-1 sm:py-0 rounded-md">
                                                 <Clock size={14} />
                                                 {formatTime(meeting.createdAt || meeting.date)}
                                             </span>
@@ -104,7 +104,7 @@ const History = () => {
 
                                 <button
                                     onClick={() => navigate(`/${meeting.meetingCode}`)}
-                                    className="px-4 py-2 rounded-lg bg-white/5 hover:bg-[#f27e20] text-gray-300 hover:text-white text-sm font-medium transition-all duration-200 border border-white/10 hover:border-[#f27e20] cursor-pointer"
+                                    className="w-full sm:w-auto px-4 py-2.5 sm:py-2 rounded-lg bg-[#f27e20]/10 sm:bg-white/5 hover:bg-[#f27e20] text-[#f27e20] sm:text-gray-300 hover:text-white text-sm font-medium transition-all duration-200 border border-[#f27e20]/30 sm:border-white/10 hover:border-[#f27e20] cursor-pointer flex justify-center items-center"
                                 >
                                     Rejoin
                                 </button>
