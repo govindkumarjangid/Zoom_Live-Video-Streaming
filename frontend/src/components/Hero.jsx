@@ -81,7 +81,7 @@ const Hero = () => {
                         initial={{ opacity: 0, y: 50, blur: "10px" }}
                         animate={{ opacity: 1, y: 0, blur: "0px" }}
                         transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
-                        className="w-full bg-[#f27e20] hover:bg-[#d96c16] text-white px-8 py-3 rounded-lg font-medium text-lg shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer mb-20 md:mb-0"
+                        className="w-full bg-[#f27e20] hover:bg-[#d96c16] text-white px-8 py-3 rounded-lg font-medium text-lg shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer mb-5 md:mb-0"
                     >
                         Get Started Free
                     </motion.button>

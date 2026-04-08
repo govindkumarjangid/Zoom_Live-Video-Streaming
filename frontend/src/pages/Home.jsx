@@ -39,7 +39,7 @@ const Home = () => {
   }
 
   return (
-    <div className="relative min-h-screen w-full bg-[#050308] text-gray-100 flex flex-col overflow-hidden z-0 font-sans">
+    <div className="relative min-h-screen md:h-screen w-full bg-[#050308] text-gray-100 flex flex-col overflow-hidden z-0 font-sans">
 
       <BgGlowingEffect />
 
@@ -126,7 +126,7 @@ const Home = () => {
       </AnimatePresence>
 
       {/* Main Content Section */}
-      <main className="relative z-10 flex-1 flex flex-col md:flex-row items-center justify-center px-8 md:px-24">
+      <main className="relative z-10 flex-1 flex flex-col md:flex-row items-center justify-center px-6 sm:px-8 md:px-24 py-8 md:py-0 mb-12 md:mb-0 space-y-12 md:space-y-0">
 
         {/* Left Column: Text and Input Form */}
         <div className="w-full md:w-1/2 flex flex-col items-start space-y-6 z-10">
@@ -178,7 +178,7 @@ const Home = () => {
         </div>
 
         {/* Right Column: Illustration */}
-        <div className="w-full md:w-1/2 flex justify-center items-center mt-12 md:mt-0 z-10">
+        <div className="hidden w-full md:w-1/2 md:flex justify-center items-center mt-12 md:mt-0 z-10">
           <motion.div
             initial={{ opacity: 0, x: 50, filter: "blur(10px)" }}
             animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}

@@ -47,7 +47,7 @@ const Navbar = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="md:hidden z-50 p-2 text-gray-300 hover:text-white transition-colors"
+                className="md:hidden z-50 p-2 text-gray-300 hover:text-white transition-colors cursor-pointer"
                 aria-label="Toggle Navigation Menu"
             >
                 {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
