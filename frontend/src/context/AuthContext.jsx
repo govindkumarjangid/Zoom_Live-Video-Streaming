@@ -2,10 +2,6 @@ import React, { useContext } from "react";
 
 const AuthContext = React.createContext();
 
-export const useAuth = () => {
-    return useContext(AuthContext);
-}
-
 export const AuthContextProvider = ({ children }) => {
 
     const user = null;
@@ -16,7 +12,7 @@ export const AuthContextProvider = ({ children }) => {
         style: {
             borderRadius: '10px',
             background: '#0D0716',
-            color: '#fff',
+            color: '#f1f2f3',
             border: '1px solid #f27e20',
         },
     }
@@ -34,4 +30,8 @@ export const AuthContextProvider = ({ children }) => {
             {children}
         </AuthContext.Provider>
     );
+}
+
+export const useAuth = () => {
+    return useContext(AuthContext);
 }

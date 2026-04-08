@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { createServer } from 'node:http';
 import connectDB from './src/configs/connectDB.js';
 import { initilizeSocketServer } from './src/configs/connectSocket.js';
+import { connectToSocket } from './src/controllers/socket.controller.js';
 import UserRouter from './src/routes/user.routes.js';
 
 dotenv.config();
@@ -11,6 +12,7 @@ dotenv.config();
 const app = express();
 const httpServer = createServer(app);
 const io = initilizeSocketServer(httpServer);
+connectToSocket(io);
 
 connectDB();
 
