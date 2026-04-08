@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, UserPlus, User, LogIn } from 'lucide-react';
+import { Mail, Lock, UserPlus, User, LogIn, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
 import axiosInstance from '../utils/axiosInstance.js';
 import { toast } from 'react-hot-toast';
@@ -11,7 +11,7 @@ const Authentication = () => {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
-        email: '',
+        username: '',
         password: '',
     });
 
@@ -32,7 +32,7 @@ const Authentication = () => {
         try {
             setLoading(true);
             const payload = formState === 'login' ? {
-                email: formData.email,
+                username: formData.username,
                 password: formData.password,
             } : formData;
 
@@ -136,18 +136,18 @@ const Authentication = () => {
 
                         {/* Email Input */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-300">Email Address</label>
+                            <label className="text-sm font-medium text-gray-300">Username</label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <Mail size={18} className="text-gray-500" />
                                 </div>
                                 <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    value={formData.email}
+                                    type="text"
+                                    id="username"
+                                    name="username"
+                                    value={formData.username}
                                     onChange={handleInputChange}
-                                    placeholder="Enter your email"
+                                    placeholder="Enter your username"
                                     className="w-full bg-[#120e1a] border border-white/10 rounded-lg py-3 pl-11 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#f27e20]/50 focus:border-[#f27e20] transition-colors"
                                 />
                             </div>
@@ -180,19 +180,16 @@ const Authentication = () => {
                             type="submit"
                             className="w-full bg-[#f27e20] hover:bg-[#d96c16] text-white py-3 rounded-lg font-medium flex justify-center items-center gap-2 shadow-lg shadow-orange-500/20 transition-all duration-200 focus:scale-105 active:scale-99 cursor-pointer mt-4"
                         >
-                            {
-                                formState === 'login' ? (
-                                    <>
-                                        <LogIn size={20} />
-                                        Sign In
-                                    </>
-                                ) : (
-                                    <>
-                                        <UserPlus size={20} />
-                                        Sign Up
-                                    </>
-                                )
-                            }
+                            {loading ? (
+                                <Loader size={20} className="animate-spin" />
+                            ) : formState === 'login' ? (
+                                <LogIn size={20} />
+                            ) : (
+                                <UserPlus size={20} />
+                            )}
+
+                            {/* Text Logic */}
+                            {loading ? 'Please wait...' : formState === 'login' ? 'Sign In' : 'Sign Up'}
                         </button>
 
                     </form>
