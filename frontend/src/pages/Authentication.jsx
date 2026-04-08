@@ -41,8 +41,9 @@ const Authentication = () => {
 
             const { message, user } = data;
             localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('token', data.token);
             toast.success(message, toastStyle);
-            naviagte('/meeting');
+            naviagte('/home');
         } catch (error) {
             console.log("Error : ", error);
             toast.error(error.response?.data?.message || 'An error occurred. Please try again.', toastStyle);

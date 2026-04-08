@@ -7,8 +7,8 @@ const meetingSchema = new mongoose.Schema({
     },
     meetingCode: {
         type: String,
-        required: true,
         unique: true,
+        required: true,
     },
     date: {
         type: Date,

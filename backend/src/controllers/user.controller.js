@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import asyncHandler from "../utils/asyncHandler.utils.js";
+import Meeting from "../models/meeting.model.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
 
@@ -29,6 +30,8 @@ export const registerUser = asyncHandler(async (req, res) => {
     await newUser.save();
 
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    newUser.token = token;
+    await newUser.save();
 
     res.status(201).json({ token, user: { id: newUser._id, name: newUser.name, username: newUser.username }, message: 'User registered successfully' });
 });
@@ -56,3 +59,38 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     }
 })
+
+
+
+export const getUserHistory = asyncHandler(async (req, res) => {
+
+    const { token } = req.query;
+
+    const user = await User.findOne({ token: token });
+    const meetings = await Meeting.find({ token: token }).sort({ createdAt: -1 });
+
+    if (!user)
+        return res.status(400).json({ message: 'Invalid token' });
+
+    res.status(200).json({ meetings, message: 'User history retrieved successfully' });
+});
+
+
+export const addToHistory = asyncHandler(async (req, res) => {
+    const { token, meeting_code } = req.body;
+
+
+    const user = await User.findOne({ token: token });
+
+    const newMeeting = new Meeting({
+        userId: user._id,
+        meetingCode: meeting_code
+    });
+
+    await newMeeting.save();
+
+    if (!user)
+        return res.status(400).json({ message: 'Invalid token' });
+
+    res.status(200).json({ message: 'Meeting added successfully' });
+});

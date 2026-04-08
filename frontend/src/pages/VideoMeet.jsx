@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast';
 import io from "socket.io-client";
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const server_url = 'http://localhost:5000';
 
@@ -17,6 +18,8 @@ const peerConfigConnections = {
 
 const VideoMeet = () => {
 
+  const navigate = useNavigate();
+
 
   const { toastStyle } = useAuth();
 
@@ -30,7 +33,7 @@ const VideoMeet = () => {
 
   let [video, setVideo] = useState(true);
   let [audio, setAudio] = useState(true);
-  console.log(video)
+
 
   let [screen, setScreen] = useState();
   let [screenAvailable, setScreenAvailable] = useState(false);
@@ -41,6 +44,11 @@ const VideoMeet = () => {
   let [messages, setMessages] = useState([])
   let [message, setMessage] = useState("");
   let [newMessages, setNewMessages] = useState(3);
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
 
 
@@ -417,7 +425,7 @@ const VideoMeet = () => {
       let tracks = localVideoref.current.srcObject.getTracks()
       tracks.forEach(track => track.stop())
     } catch (e) { }
-    window.location.href = "/"
+     navigate('/home');
   }
 
   let openChat = () => {
@@ -432,7 +440,6 @@ const VideoMeet = () => {
   }
 
   const addMessage = (data, sender, socketIdSender) => {
-    console.log("Socket received message inside addMessage:", data, sender, socketIdSender);
     setMessages((prevMessages) => [
       ...prevMessages,
       { sender: sender, data: data }
@@ -527,7 +534,7 @@ const VideoMeet = () => {
             <div className="flex-1 flex w-full relative">
               {/* Conference View */}
 
-              <div className={`p-4 flex-1 grid gap-4 transition-all duration-300 ${showModal ? 'w-[calc(100%-350px)]' : 'w-full'} auto-rows-fr grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`}>
+              <div className={`p-4 flex-1 grid gap-4 transition-all duration-300 ${showModal ? 'w-full md:w-[calc(100%-350px)]' : 'w-full'} auto-rows-fr grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`}>
 
                 <div className="relative bg-black rounded-2xl overflow-hidden border border-white/10">
                   <video
@@ -564,7 +571,7 @@ const VideoMeet = () => {
 
               {/* Chat Sidebar */}
               {showModal && (
-                <div className="w-87.5 bg-[#120e1a]/90 backdrop-blur-xl border-l border-white/10 flex flex-col h-full absolute right-0 top-0 animate-in slide-in-from-right z-30 shadow-2xl">
+                <div className="w-full md:w-87.5 bg-[#120e1a]/95 md:bg-[#120e1a]/90 backdrop-blur-xl border-l border-white/10 flex flex-col h-full absolute right-0 top-0 animate-in slide-in-from-right z-30 shadow-2xl">
                   <div className="p-4 border-b border-white/10 flex justify-between items-center">
                     <h2 className="text-xl font-semibold">Chat</h2>
                     <button onClick={closeChat} className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white cursor-pointer">
@@ -583,6 +590,7 @@ const VideoMeet = () => {
                         <p>No Messages Yet</p>
                       </div>
                     )}
+                    <div ref={messagesEndRef} />
                   </div>
 
                   <div className="p-4 border-t border-white/10 bg-[#050308]">

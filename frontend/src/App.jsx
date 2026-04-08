@@ -3,6 +3,7 @@ import HeroSection from './pages/HeroSection'
 import Authentication from './pages/Authentication'
 import { Toaster } from 'react-hot-toast'
 import VideoMeet from './pages/VideoMeet'
+import Home from './pages/Home'
 
 const App = () => {
   return (
@@ -10,7 +11,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HeroSection />} />
         <Route path="/authentication" element={<Authentication />} />
-        <Route path="/meeting" element={<VideoMeet />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/:url" element={<VideoMeet />} />
       </Routes>
 
 
