@@ -5,6 +5,7 @@ import { Clock, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import BgGlowingEffect from '../components/BgGlowingEffect';
 import { useHistory } from '../context/HistoryContext.jsx';
+import toast from 'react-hot-toast';
 
 const Home = () => {
 
@@ -15,6 +16,17 @@ const Home = () => {
   const { addToHistory } = useHistory();
 
   let handleJoinVideoCall = async () => {
+    if (!meetingCode.trim()) {
+      toast.error('Please enter a meeting code to join', {
+        style: {
+            borderRadius: '10px',
+            background: '#120E1A',
+            color: '#f1f2f3',
+            border: '1px solid #f27e20',
+        },
+      });
+      return;
+    }
     await addToHistory(meetingCode);
     navigate(`/${meetingCode}`);
   }
@@ -47,7 +59,9 @@ const Home = () => {
           animate={{ opacity: 1, y: 0, blur: "0px" }}
           transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
           className="flex items-center gap-6">
-          <button className="flex items-center gap-2 text-gray-300 hover:text-white transition-all duration-150 active:scale-95 text-sm font-medium cursor-pointer">
+          <button
+            onClick={() => navigate('/history')}
+            className="flex items-center gap-2 text-gray-300 hover:text-white transition-all duration-150 active:scale-95 text-sm font-medium cursor-pointer">
             <Clock size={18} />
             History
           </button>
@@ -77,18 +91,37 @@ const Home = () => {
             initial={{ opacity: 0, y: 50, blur: "10px" }}
             animate={{ opacity: 1, y: 0, blur: "0px" }}
             transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
-            className="flex items-center gap-3 w-full max-w-md mt-4">
-            <input
-              type="text"
-              placeholder="Meeting Code"
-              value={meetingCode}
-              onChange={(e) => setMeetingCode(e.target.value)}
-              className="w-full bg-[#120e1a] border border-white/10 rounded-lg py-3 px-4 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#f27e20]/50 focus:border-[#f27e20] transition-colors"
-            />
+            className="flex flex-col gap-4 w-full max-w-md mt-4">
+            <div className="flex items-center gap-3 w-full">
+              <input
+                type="text"
+                placeholder="Meeting Code"
+                value={meetingCode}
+                onChange={(e) => setMeetingCode(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleJoinVideoCall()}
+                className="w-full bg-[#120e1a] border border-white/10 rounded-lg py-3 px-4 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#f27e20]/50 focus:border-[#f27e20] transition-colors"
+              />
+              <button
+                onClick={handleJoinVideoCall}
+                className="bg-[#f27e20] hover:bg-[#d96c16] text-white font-medium px-8 py-3 rounded-md transition-all duration-100 hover:scale-105 active:scale-97 shadow-lg cursor-pointer">
+                JOIN
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 mt-2">
+              <div className="h-px bg-white/10 flex-1"></div>
+              <span className="text-gray-500 text-sm font-medium">OR</span>
+              <div className="h-px bg-white/10 flex-1"></div>
+            </div>
+
             <button
-              onClick={handleJoinVideoCall}
-              className="bg-[#f27e20] hover:bg-[#d96c16] text-white font-medium px-8 py-3 rounded-md transition-all duration-100 hover:scale-105 active:scale-97 shadow-lg cursor-pointer">
-              JOIN
+                onClick={async () => {
+                  const newCode = Math.random().toString(36).substring(2, 9) + "-" + Math.random().toString(36).substring(2, 9);
+                  await addToHistory(newCode);
+                  navigate(`/${newCode}`);
+                }}
+                className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium px-8 py-3 rounded-md transition-all duration-100 hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
+                Start New Meeting
             </button>
           </motion.div>
         </div>

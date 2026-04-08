@@ -63,34 +63,31 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 
 export const getUserHistory = asyncHandler(async (req, res) => {
+    try {
+        const user = req.user;
+        const meetings = await Meeting.find({ userId: user._id }).sort({ createdAt: -1 });
 
-    const { token } = req.query;
-
-    const user = await User.findOne({ token: token });
-    const meetings = await Meeting.find({ token: token }).sort({ createdAt: -1 });
-
-    if (!user)
-        return res.status(400).json({ message: 'Invalid token' });
-
-    res.status(200).json({ meetings, message: 'User history retrieved successfully' });
+        res.status(200).json({ meetings, message: 'User history retrieved successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving history', error: error.message });
+    }
 });
 
 
 export const addToHistory = asyncHandler(async (req, res) => {
-    const { token, meeting_code } = req.body;
+    try {
+        const { meeting_code } = req.body;
+        const user = req.user;
 
+        const newMeeting = new Meeting({
+            userId: user._id,
+            meetingCode: meeting_code
+        });
 
-    const user = await User.findOne({ token: token });
+        await newMeeting.save();
 
-    const newMeeting = new Meeting({
-        userId: user._id,
-        meetingCode: meeting_code
-    });
-
-    await newMeeting.save();
-
-    if (!user)
-        return res.status(400).json({ message: 'Invalid token' });
-
-    res.status(200).json({ message: 'Meeting added successfully' });
+        res.status(201).json({ message: 'Meeting added successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error adding meeting to history', error: error.message });
+    }
 });

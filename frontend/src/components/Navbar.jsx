@@ -21,10 +21,8 @@ const Navbar = () => {
                 animate={{ opacity: 1, y: 0, blur: "0px" }}
                 transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
                 className="flex items-center space-x-6 text-base">
-                <button to="#" className="text-gray-300 transition-all duration-100 hover:scale-105 active:scale-97 cursor-pointer">Join as Guest</button>
-
                 <button
-                    onClick={() => {
+                    onClick={() => {  
                         naviagte('/authentication');
                         setFormState('register');
                     }}

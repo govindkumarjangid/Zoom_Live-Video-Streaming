@@ -7,7 +7,6 @@ const meetingSchema = new mongoose.Schema({
     },
     meetingCode: {
         type: String,
-        unique: true,
         required: true,
     },
     date: {
@@ -17,5 +16,10 @@ const meetingSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const Meeting = mongoose.model('Meeting', meetingSchema);
+
+// Drop the unique index on meetingCode if it exists so multiple users can join the same meeting
+Meeting.collection.dropIndex('meetingCode_1').catch(err => {
+    // silently ignore if index doesn't exist
+});
 
 export default Meeting;

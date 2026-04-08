@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import io from "socket.io-client";
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const server_url = 'http://localhost:5000';
 
@@ -570,8 +571,12 @@ const VideoMeet = () => {
               </div>
 
               {/* Chat Sidebar */}
-              {showModal && (
-                <div className="w-full md:w-87.5 bg-[#120e1a]/95 md:bg-[#120e1a]/90 backdrop-blur-xl border-l border-white/10 flex flex-col h-full absolute right-0 top-0 animate-in slide-in-from-right z-30 shadow-2xl">
+              <motion.div
+                initial={{ x: "100%" }}
+                animate={{ x: showModal ? 0 : "100%" }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="w-full md:w-87.5 bg-[#120e1a]/95 md:bg-[#120e1a]/90 backdrop-blur-xl border-l border-white/10 flex flex-col h-full absolute right-0 top-0 z-30 shadow-2xl"
+              >
                   <div className="p-4 border-b border-white/10 flex justify-between items-center">
                     <h2 className="text-xl font-semibold">Chat</h2>
                     <button onClick={closeChat} className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white cursor-pointer">
@@ -601,25 +606,24 @@ const VideoMeet = () => {
                         onChange={handleMessage}
                         onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                         placeholder="Type a message..."
-                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-orange-500 transition-colors text-white"
+                        className="flex-1 w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-orange-500 transition-colors text-white"
                       />
                       <button
                         onClick={sendMessage}
-                        className="bg-[#f27e20] hover:bg-[#d96c16] text-white p-2 rounded-lg transition-colors flex items-center justify-center cursor-pointer"
+                        className="bg-[#f27e20] hover:bg-[#d96c16] text-white p-3 rounded-lg transition-colors flex items-center justify-center cursor-pointer shrink-0"
                       >
                         <Send size={18} />
                       </button>
                     </div>
                   </div>
 
-                </div>
-              )}
+                </motion.div>
 
 
             </div>
 
             {/* Bottom Controls */}
-            <div className="h-20 bg-[#120e1a]/80 backdrop-blur-xl border-t border-white/10 flex items-center justify-center gap-4 px-6 relative z-20">
+            <div className="h-auto py-4 min-h-20 bg-[#120e1a]/80 backdrop-blur-xl border-t border-white/10 flex flex-wrap items-center justify-center gap-3 sm:gap-4 px-4 sm:px-6 relative z-20">
               <button
                 onClick={handleAudio}
                 className={`p-3 rounded-full transition-colors flex items-center justify-center border cursor-pointer ${audio ? 'bg-white/10 hover:bg-white/20 border-white/10' : 'bg-red-500/20 hover:bg-red-500/30 border-red-500/50 text-red-500'}`}

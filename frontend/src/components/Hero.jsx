@@ -2,10 +2,29 @@ import { motion } from 'framer-motion';
 import { MicOff, Video, PhoneOff, Settings, FlipHorizontal, Volume2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+
 const Hero = () => {
 
     const naviagte = useNavigate();
     const { setFormState } = useAuth();
+    const [meetingCode, setMeetingCode] = useState('');
+
+    const handleJoinAsGuest = () => {
+        if (!meetingCode.trim()) {
+            toast.error('Please enter a meeting code first', {
+                style: {
+                    borderRadius: '10px',
+                    background: '#32303A',
+                    color: '#f1f2f3',
+                    border: '1px solid #f27e20',
+                },
+            });
+            return;
+        }
+        naviagte(`/${meetingCode}`);
+    };
 
     return (
         <main className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 md:px-12 flex flex-1 gap-6 md:gap-12 items-center justify-center flex-col-reverse md:flex-row h-full pb-8 md:py-0 overflow-hidden">
@@ -32,18 +51,48 @@ const Hero = () => {
                     Experience high-definition video meetings with crystal-clear audio. Bridge the distance instantly with secure, reliable connections for your friends, family, and teams.
                 </motion.p>
 
-                <motion.button
-                    onClick={() => {
-                        setFormState('register');
-                        naviagte('/authentication');
-                    }}
-                    initial={{ opacity: 0, y: 50, blur: "10px" }}
-                    animate={{ opacity: 1, y: 0, blur: "0px" }}
-                    transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
-                    className="bg-[#f27e20] hover:bg-[#d96c16] text-white px-8 py-3 rounded-md font-medium text-lg mt-4 shadow-lg transition-all duration-100 hover:scale-105 active:scale-97 cursor-pointer "
-                >
-                    Get Started
-                </motion.button>
+                <div className="flex flex-col w-full max-w-md gap-4 mt-4">
+                    <motion.div
+                        initial={{ opacity: 0, y: 50, blur: "10px" }}
+                        animate={{ opacity: 1, y: 0, blur: "0px" }}
+                        transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
+                        className="flex flex-col sm:flex-row gap-3 w-full"
+                    >
+                        <input
+                            type="text"
+                            placeholder="Enter Meeting Code"
+                            value={meetingCode}
+                            onChange={(e) => setMeetingCode(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleJoinAsGuest()}
+                            className="w-full sm:flex-1 bg-[#120e1a] border border-white/10 rounded-lg py-3 px-4 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#f27e20]/50 focus:border-[#f27e20] transition-colors"
+                        />
+                        <button
+                            onClick={handleJoinAsGuest}
+                            className="bg-white/10 hover:bg-white/20 text-white font-medium px-6 py-3 rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] border border-white/10 cursor-pointer whitespace-nowrap"
+                        >
+                            Join as Guest
+                        </button>
+                    </motion.div>
+
+                    <motion.div className="flex items-center gap-4 w-full">
+                        <div className="h-px bg-white/10 flex-1"></div>
+                        <span className="text-gray-500 text-sm font-medium">OR</span>
+                        <div className="h-px bg-white/10 flex-1"></div>
+                    </motion.div>
+
+                    <motion.button
+                        onClick={() => {
+                            setFormState('register');
+                            naviagte('/authentication');
+                        }}
+                        initial={{ opacity: 0, y: 50, blur: "10px" }}
+                        animate={{ opacity: 1, y: 0, blur: "0px" }}
+                        transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+                        className="w-full bg-[#f27e20] hover:bg-[#d96c16] text-white px-8 py-3 rounded-lg font-medium text-lg shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                    >
+                        Get Started Free
+                    </motion.button>
+                </div>
             </div>
 
             {/* Right Column: Phone Mockups */}

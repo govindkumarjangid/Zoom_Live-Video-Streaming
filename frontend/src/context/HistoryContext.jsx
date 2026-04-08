@@ -10,7 +10,7 @@ export const HistoryProvider = ({ children }) => {
     const toastStyle = {
         style: {
             borderRadius: '10px',
-            background: '#32303A',
+            background: '#0F0C17',
             color: '#f1f2f3',
             border: '1px solid #f27e20',
         },
