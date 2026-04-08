@@ -1,6 +1,8 @@
 import { Video, VideoOff, Mic, MicOff, PhoneOff, MonitorUp, MonitorOff, MessageSquare, Send, User, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast';
 import io from "socket.io-client";
+import { useAuth } from '../context/AuthContext';
 
 const server_url = 'http://localhost:5000';
 
@@ -16,6 +18,8 @@ const peerConfigConnections = {
 const VideoMeet = () => {
 
 
+  const { toastStyle } = useAuth();
+
   var socketRef = useRef();
   let socketIdRef = useRef();
   let localVideoref = useRef();
@@ -26,6 +30,7 @@ const VideoMeet = () => {
 
   let [video, setVideo] = useState(true);
   let [audio, setAudio] = useState(true);
+  console.log(video)
 
   let [screen, setScreen] = useState();
   let [screenAvailable, setScreenAvailable] = useState(false);
@@ -113,7 +118,14 @@ const VideoMeet = () => {
     for (let id in connections) {
       if (id === socketIdRef.current) continue
 
-      connections[id].addStream(window.localStream)
+        window.localStream.getTracks().forEach(track => {
+          let sender = connections[id].getSenders().find(s => s.track && s.track.kind === track.kind)
+          if (sender) {
+            sender.replaceTrack(track)
+          } else {
+            connections[id].addTrack(track, window.localStream)
+          }
+        })
 
       connections[id].createOffer().then((description) => {
         console.log(description)
@@ -139,7 +151,14 @@ const VideoMeet = () => {
       localVideoref.current.srcObject = window.localStream
 
       for (let id in connections) {
-        connections[id].addStream(window.localStream)
+        window.localStream.getTracks().forEach(track => {
+          let sender = connections[id].getSenders().find(s => s.track && s.track.kind === track.kind)
+          if (sender) {
+            sender.replaceTrack(track)
+          } else {
+            connections[id].addTrack(track, window.localStream)
+          }
+        } )
 
         connections[id].createOffer().then((description) => {
           connections[id].setLocalDescription(description)
@@ -251,63 +270,75 @@ const VideoMeet = () => {
       socketRef.current.on('user-joined', (id, clients) => {
         clients.forEach((socketListId) => {
           if (connections[socketListId] === undefined && socketListId !== socketIdRef.current) {
-             connections[socketListId] = new RTCPeerConnection(peerConfigConnections)
+            connections[socketListId] = new RTCPeerConnection(peerConfigConnections)
 
-             // Wait for their ice candidate
-             connections[socketListId].onicecandidate = function (event) {
-               if (event.candidate != null) {
-                 socketRef.current.emit('signal', socketListId, JSON.stringify({ 'ice': event.candidate }))
-               }
-             }
+            // Wait for their ice candidate
+            connections[socketListId].onicecandidate = function (event) {
+              if (event.candidate != null) {
+                socketRef.current.emit('signal', socketListId, JSON.stringify({ 'ice': event.candidate }))
+              }
+            }
 
-             // Wait for their video stream (modern browsers use ontrack)
-             connections[socketListId].ontrack = (event) => {
-               console.log("BEFORE:", videoRef.current);
-               console.log("FINDING ID: ", socketListId);
+            // Wait for their video stream (modern browsers use ontrack)
+            connections[socketListId].ontrack = (event) => {
+              console.log("BEFORE:", videoRef.current);
+              console.log("FINDING ID: ", socketListId);
 
-               let stream = event.streams[0]; // Extract the remote stream
+              let stream = event.streams[0]; // Extract the remote stream
 
-               let videoExists = videoRef.current.find(video => video.socketId === socketListId);
+              let videoExists = videoRef.current.find(video => video.socketId === socketListId);
 
-               if (videoExists) {
-                 console.log("FOUND EXISTING");
-                 // Update the stream of the existing video
-                 setVideos(videos => {
-                   const updatedVideos = videos.map(video =>
-                     video.socketId === socketListId ? { ...video, stream: stream } : video
-                   );
-                   videoRef.current = updatedVideos;
-                   return updatedVideos;
-                 });
-               } else {
-                 console.log("CREATING NEW");
-                 let newVideo = {
-                   socketId: socketListId,
-                   stream: stream,
-                   autoplay: true,
-                   playsinline: true
-                 };
+              if (videoExists) {
+                console.log("FOUND EXISTING");
+                // Update the stream of the existing video
+                setVideos(videos => {
+                  const updatedVideos = videos.map(video =>
+                    video.socketId === socketListId ? { ...video, stream: stream } : video
+                  );
+                  videoRef.current = updatedVideos;
+                  return updatedVideos;
+                });
+              } else {
+                console.log("CREATING NEW");
+                let newVideo = {
+                  socketId: socketListId,
+                  stream: stream,
+                  autoplay: true,
+                  playsinline: true
+                };
 
-                 setVideos(videos => {
-                   const updatedVideos = [...videos, newVideo];
-                   videoRef.current = updatedVideos;
-                   return updatedVideos;
-                 });
-               }
-             };
+                // Synchronous update to prevent second track from bypassing the check
+                videoRef.current = [...videoRef.current, newVideo];
 
-             // Add the local video stream using modern addTrack
-             if (window.localStream !== undefined && window.localStream !== null) {
-               window.localStream.getTracks().forEach(track => {
-                 connections[socketListId].addTrack(track, window.localStream);
-               });
-             } else {
-               let blackSilence = (...args) => new MediaStream([black(...args), silence()])
-               window.localStream = blackSilence()
-               window.localStream.getTracks().forEach(track => {
-                 connections[socketListId].addTrack(track, window.localStream);
-               });
-             }
+                setVideos(videos => {
+                  if (videos.some(video => video.socketId === socketListId)) {
+                     // In case React batched and already added it, just update the stream
+                     const updatedVideos = videos.map(video =>
+                      video.socketId === socketListId ? { ...video, stream: stream } : video
+                     );
+                     videoRef.current = updatedVideos;
+                     return updatedVideos;
+                  }
+
+                  const updatedVideos = [...videos, newVideo];
+                  videoRef.current = updatedVideos;
+                  return updatedVideos;
+                });
+              }
+            };
+
+            // Add the local video stream using modern addTrack
+            if (window.localStream !== undefined && window.localStream !== null) {
+              window.localStream.getTracks().forEach(track => {
+                connections[socketListId].addTrack(track, window.localStream);
+              });
+            } else {
+              let blackSilence = (...args) => new MediaStream([black(...args), silence()])
+              window.localStream = blackSilence()
+              window.localStream.getTracks().forEach(track => {
+                connections[socketListId].addTrack(track, window.localStream);
+              });
+            }
           }
         })
 
@@ -414,6 +445,10 @@ const VideoMeet = () => {
 
 
   let sendMessage = () => {
+    if (message === "") {
+      toast.error("Please enter a message", toastStyle);
+      return;
+    }
     console.log("SENDING MESSAGE: ", message, " FROM USER: ", username);
     console.log("SOCKET: ", socketRef.current);
     socketRef.current.emit('chat-message', message, username)

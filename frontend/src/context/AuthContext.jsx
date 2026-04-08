@@ -11,7 +11,7 @@ export const AuthContextProvider = ({ children }) => {
     const toastStyle = {
         style: {
             borderRadius: '10px',
-            background: '#0D0716',
+            background: '#32303A',
             color: '#f1f2f3',
             border: '1px solid #f27e20',
         },
