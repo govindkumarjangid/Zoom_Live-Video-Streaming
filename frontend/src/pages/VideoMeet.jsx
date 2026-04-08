@@ -39,7 +39,7 @@ const VideoMeet = () => {
   let [screen, setScreen] = useState();
   let [screenAvailable, setScreenAvailable] = useState(false);
 
-  let [showModal, setModal] = useState(true);
+  let [showModal, setModal] = useState(false);
 
 
   let [messages, setMessages] = useState([])
@@ -55,6 +55,15 @@ const VideoMeet = () => {
 
   let [askForUsername, setAskForUsername] = useState(true);
   let [username, setUsername] = useState("");
+
+  const usernameRef = useRef(username);
+  useEffect(() => { usernameRef.current = username; }, [username]);
+
+  const videoRefState = useRef(video);
+  useEffect(() => { videoRefState.current = video; }, [video]);
+
+  const audioRefState = useRef(audio);
+  useEffect(() => { audioRefState.current = audio; }, [audio]);
 
 
   let [videos, setVideos] = useState([]);
@@ -127,14 +136,14 @@ const VideoMeet = () => {
     for (let id in connections) {
       if (id === socketIdRef.current) continue
 
-        window.localStream.getTracks().forEach(track => {
-          let sender = connections[id].getSenders().find(s => s.track && s.track.kind === track.kind)
-          if (sender) {
-            sender.replaceTrack(track)
-          } else {
-            connections[id].addTrack(track, window.localStream)
-          }
-        })
+      window.localStream.getTracks().forEach(track => {
+        let sender = connections[id].getSenders().find(s => s.track && s.track.kind === track.kind)
+        if (sender) {
+          sender.replaceTrack(track)
+        } else {
+          connections[id].addTrack(track, window.localStream)
+        }
+      })
 
       connections[id].createOffer().then((description) => {
         console.log(description)
@@ -167,7 +176,7 @@ const VideoMeet = () => {
           } else {
             connections[id].addTrack(track, window.localStream)
           }
-        } )
+        })
 
         connections[id].createOffer().then((description) => {
           connections[id].setLocalDescription(description)
@@ -243,14 +252,40 @@ const VideoMeet = () => {
       // Create connection if we haven't seen this user yet somehow
       if (connections[fromId] === undefined) return;
 
+      if (signal.type === 'peer-state') {
+        setVideos(videos => videos.map(video =>
+          video.socketId === fromId ? {
+            ...video,
+            videoOff: signal.videoOff,
+            audioOff: signal.audioOff,
+            username: signal.username
+          } : video
+        ));
+      }
+
       if (signal.sdp) {
         connections[fromId].setRemoteDescription(new RTCSessionDescription(signal.sdp)).then(() => {
           if (signal.sdp.type === 'offer') {
             connections[fromId].createAnswer().then((description) => {
               connections[fromId].setLocalDescription(description).then(() => {
                 socketRef.current.emit('signal', fromId, JSON.stringify({ 'sdp': connections[fromId].localDescription }))
+
+                socketRef.current.emit('signal', fromId, JSON.stringify({
+                  'type': 'peer-state',
+                  'videoOff': !videoRefState.current,
+                  'audioOff': !audioRefState.current,
+                  'username': usernameRef.current
+                }));
+
               }).catch(e => console.log(e))
             }).catch(e => console.log(e))
+          } else if (signal.sdp.type === 'answer') {
+            socketRef.current.emit('signal', fromId, JSON.stringify({
+              'type': 'peer-state',
+              'videoOff': !videoRefState.current,
+              'audioOff': !audioRefState.current,
+              'username': usernameRef.current
+            }));
           }
         }).catch(e => console.log(e))
       }
@@ -321,12 +356,12 @@ const VideoMeet = () => {
 
                 setVideos(videos => {
                   if (videos.some(video => video.socketId === socketListId)) {
-                     // In case React batched and already added it, just update the stream
-                     const updatedVideos = videos.map(video =>
+                    // In case React batched and already added it, just update the stream
+                    const updatedVideos = videos.map(video =>
                       video.socketId === socketListId ? { ...video, stream: stream } : video
-                     );
-                     videoRef.current = updatedVideos;
-                     return updatedVideos;
+                    );
+                    videoRef.current = updatedVideos;
+                    return updatedVideos;
                   }
 
                   const updatedVideos = [...videos, newVideo];
@@ -390,6 +425,16 @@ const VideoMeet = () => {
       window.localStream.getVideoTracks().forEach(track => track.enabled = !video);
     }
     setVideo(!video);
+
+    // Broadcast the new video state to all connected peers
+    for (let id in connections) {
+      socketRef.current.emit('signal', id, JSON.stringify({
+        'type': 'peer-state',
+        'videoOff': video,
+        'audioOff': !audio,
+        'username': username
+      }));
+    }
   }
 
   let handleAudio = () => {
@@ -397,7 +442,31 @@ const VideoMeet = () => {
       window.localStream.getAudioTracks().forEach(track => track.enabled = !audio);
     }
     setAudio(!audio)
+
+    // Broadcast the new audio state to all connected peers
+    for (let id in connections) {
+      socketRef.current.emit('signal', id, JSON.stringify({
+        'type': 'peer-state',
+        'videoOff': !video,
+        'audioOff': audio,
+        'username': username
+      }));
+    }
   }
+
+  // Effect to broadcast state whenever a new peer joins
+  useEffect(() => {
+    if (socketRef.current && username) {
+      for (let id in connections) {
+        socketRef.current.emit('signal', id, JSON.stringify({
+          'type': 'peer-state',
+          'videoOff': !video,
+          'audioOff': !audio,
+          'username': username
+        }));
+      }
+    }
+  }, [videos.length, username, video, audio])
 
   useEffect(() => {
     if (screen !== undefined) {
@@ -426,13 +495,14 @@ const VideoMeet = () => {
       let tracks = localVideoref.current.srcObject.getTracks()
       tracks.forEach(track => track.stop())
     } catch (e) { }
-     navigate('/home');
+    navigate('/home');
   }
 
   let openChat = () => {
     setModal(true);
     setNewMessages(0);
   }
+
   let closeChat = () => {
     setModal(false);
   }
@@ -478,6 +548,7 @@ const VideoMeet = () => {
       {
 
         askForUsername ? (
+
           <div className="min-h-screen w-full flex flex-col justify-center items-center bg-[#050308] text-white relative overflow-hidden">
 
 
@@ -527,100 +598,143 @@ const VideoMeet = () => {
             </div>
 
           </div>
+
         ) : (
 
           <div className="h-screen w-full bg-[#050308] text-white flex flex-col relative overflow-hidden">
+            {/* Conference View */}
+            <div className={`p-6 transition-all duration-300 h-full overflow-y-auto ${showModal
+              ? 'flex flex-col justify-between space-y-4 w-full md:w-[calc(100%-350px)]'
+              : `flex-1 grid gap-4 w-full auto-rows-fr ${videos.length === 0 ? 'grid-cols-1 md:w-3/4 mx-auto' : videos.length === 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`
+              }`}>
 
-            {/* Main Video Area */}
-            <div className="flex-1 flex w-full relative">
-              {/* Conference View */}
-
-              <div className={`p-4 flex-1 grid gap-4 transition-all duration-300 ${showModal ? 'w-full md:w-[calc(100%-350px)]' : 'w-full'} auto-rows-fr grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`}>
-
-                <div className="relative bg-black rounded-2xl overflow-hidden border border-white/10">
-                  <video
-                    className="w-full h-full object-cover transform scale-x-[-1]"
-                    ref={(ref) => {
-                      localVideoref.current = ref;
-                      if (ref && window.localStream) {
-                        ref.srcObject = window.localStream;
-                      }
-                    }}
-                    autoPlay
-                    muted
-                  ></video>
-                  <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur px-3 py-1.5 rounded-lg text-sm font-medium">You</div>
+              {/* Local Video (You - Top Left) */}
+              <div className={`${showModal ? 'self-start w-full md:w-[60%] lg:w-[40%] aspect-video rounded-2xl border-2' : 'w-full h-full rounded-2xl border'} relative shrink-0 transition-all duration-300 bg-[#3c4043] overflow-hidden border-white/10 flex items-center justify-center shadow-[0_0_20px_rgba(0,0,0,0.4)]`}>
+                <video
+                  className={`w-full h-full object-cover transform scale-x-[-1] transition-opacity duration-300 ${!video ? 'opacity-0' : 'opacity-100'}`}
+                  ref={(ref) => {
+                    localVideoref.current = ref;
+                    if (ref && window.localStream && ref.srcObject !== window.localStream) {
+                      ref.srcObject = window.localStream;
+                    }
+                  }}
+                  autoPlay
+                  muted
+                ></video>
+                {!video && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-[#1e1e1e]">
+                    <div className={`${showModal ? 'w-16 h-16 text-3xl' : 'w-24 h-24 text-4xl'} rounded-full bg-[#f27e20] flex items-center justify-center font-semibold text-white shadow-lg`}>
+                      {username ? username.charAt(0).toUpperCase() : 'Y'}
+                    </div>
+                  </div>
+                )}
+                <div className="absolute bottom-4 left-4 bg-[#1e1e1e]/80 backdrop-blur-sm px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm border border-white/5 text-white">
+                  {username || 'You'} {!audio && <MicOff size={14} className="text-red-500" />}
                 </div>
+              </div>
 
-                {videos.map((video) => (
-                  <div key={video.socketId} className="relative bg-black rounded-2xl overflow-hidden border border-white/10">
+              {/* Remote Videos (Other User - Bottom Right) */}
+              {videos.map((videoContainer, index) => {
+                const targetTrack = videoContainer.stream?.getVideoTracks()[0];
+                let isVideoOff = videoContainer.videoOff;
+                if (isVideoOff === undefined) {
+                  isVideoOff = !targetTrack || !targetTrack.enabled || targetTrack.muted;
+                }
+
+                const colors = ['#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722', '#795548', '#607d8b'];
+                const bgColor = colors[index % colors.length];
+                const remoteUserName = videoContainer.username || `User-${videoContainer.socketId.substring(0, 4).toUpperCase()}`;
+
+                return (
+                  <div key={videoContainer.socketId} className={`${showModal ? `self-end w-full md:w-[60%] lg:w-[40%] aspect-video rounded-2xl border-2` : 'w-full h-full rounded-2xl border'} relative shrink-0 transition-all duration-300 bg-[#3c4043] overflow-hidden border-white/10 flex items-center justify-center shadow-[0_0_20px_rgba(0,0,0,0.4)]`}>
                     <video
-                      className="w-full h-full object-cover"
-                      data-socket={video.socketId}
+                      className={`w-full h-full object-cover transition-opacity duration-300 ${isVideoOff ? 'opacity-0' : 'opacity-100'}`}
+                      data-socket={videoContainer.socketId}
                       ref={ref => {
-                        if (ref && video.stream) {
-                          ref.srcObject = video.stream;
+                        if (ref && videoContainer.stream && ref.srcObject !== videoContainer.stream) {
+                          ref.srcObject = videoContainer.stream;
+                          if (targetTrack) {
+                            targetTrack.onmute = () => setVideos(v => [...v]);
+                            targetTrack.onunmute = () => setVideos(v => [...v]);
+                          }
                         }
                       }}
                       autoPlay
                     >
                     </video>
-                  </div>
-                ))}
-
-              </div>
-
-              {/* Chat Sidebar */}
-              <motion.div
-                initial={{ x: "100%" }}
-                animate={{ x: showModal ? 0 : "100%" }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="w-full md:w-87.5 bg-[#120e1a]/95 md:bg-[#120e1a]/90 backdrop-blur-xl border-l border-white/10 flex flex-col h-full absolute right-0 top-0 z-30 shadow-2xl"
-              >
-                  <div className="p-4 border-b border-white/10 flex justify-between items-center">
-                    <h2 className="text-xl font-semibold">Chat</h2>
-                    <button onClick={closeChat} className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white cursor-pointer">
-                      <X size={20} />
-                    </button>
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    {messages.length !== 0 ? messages.map((item, index) => (
-                      <div className="bg-white/5 p-3 rounded-lg" key={index}>
-                        <p className="text-xs text-orange-400 font-bold mb-1">{item.sender}</p>
-                        <p className="text-sm text-gray-200">{item.data}</p>
-                      </div>
-                    )) : (
-                      <div className="h-full flex items-center justify-center text-gray-500">
-                        <p>No Messages Yet</p>
+                    {isVideoOff && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-[#1e1e1e]">
+                        <div
+                          className={`${showModal ? 'w-16 h-16 text-3xl' : 'w-24 h-24 text-4xl'} rounded-full flex items-center justify-center font-semibold text-white shadow-lg`}
+                          style={{ backgroundColor: bgColor }}
+                        >
+                          {remoteUserName.charAt(0).toUpperCase()}
+                        </div>
                       </div>
                     )}
-                    <div ref={messagesEndRef} />
-                  </div>
-
-                  <div className="p-4 border-t border-white/10 bg-[#050308]">
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={message}
-                        onChange={handleMessage}
-                        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                        placeholder="Type a message..."
-                        className="flex-1 w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-orange-500 transition-colors text-white"
-                      />
-                      <button
-                        onClick={sendMessage}
-                        className="bg-[#f27e20] hover:bg-[#d96c16] text-white p-3 rounded-lg transition-colors flex items-center justify-center cursor-pointer shrink-0"
-                      >
-                        <Send size={18} />
-                      </button>
+                    <div className="absolute bottom-4 left-4 bg-[#1e1e1e]/80 backdrop-blur-sm px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm border border-white/5 text-white">
+                      {remoteUserName}
+                      {videoContainer.audioOff && <MicOff size={14} className="text-red-500" />}
                     </div>
                   </div>
-
-                </motion.div>
-
+                )
+              })}
 
             </div>
+
+            {/* Chat Sidebar */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: showModal ? 0 : "100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="w-full md:w-87.5 bg-[#050308] border-l border-white/10 flex flex-col absolute right-0 top-0 bottom-0 z-40 shadow-2xl"
+            >
+              <div className="p-4 border-b border-white/10 flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-white">Chat</h2>
+                <button onClick={closeChat} className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white cursor-pointer">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                {messages.length !== 0 ? messages.map((item, index) => {
+                  const isMe = item.sender === username;
+                  return (
+                    <div className={`flex w-full ${isMe ? 'justify-end' : 'justify-start'}`} key={index}>
+                      <div className={`max-w-[75%] px-4 py-2 shadow-sm ${isMe ? 'bg-[#f27e20] text-white rounded-2xl rounded-tr-sm' : 'bg-white/10 border border-white/10 text-white rounded-2xl rounded-tl-sm'}`}>
+                        <p className="text-[15px] leading-relaxed break-words">{item.data}</p>
+                      </div>
+                    </div>
+                  )
+                }) : (
+                  <div className="h-full flex items-center justify-center text-gray-500">
+                    <p>No Messages Yet</p>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              <div className="h-auto p-4 min-h-20 border-t border-white/10 bg-[#120e1a]">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={message}
+                    onChange={handleMessage}
+                    onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+                    placeholder="Type a message..."
+                    className="flex-1 w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-orange-500 transition-colors text-white"
+                  />
+                  <button
+                    onClick={sendMessage}
+                    className="bg-[#f27e20] hover:bg-[#d96c16] text-white p-3 rounded-lg transition-colors flex items-center justify-center cursor-pointer shrink-0"
+                  >
+                    <Send size={18} />
+                  </button>
+                </div>
+              </div>
+
+            </motion.div>
+
 
             {/* Bottom Controls */}
             <div className="h-auto py-4 min-h-20 bg-[#120e1a]/80 backdrop-blur-xl border-t border-white/10 flex flex-wrap items-center justify-center gap-3 sm:gap-4 px-4 sm:px-6 relative z-20">
