@@ -1,30 +1,35 @@
-<svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="50 50 50 50"
-        className="w-8 h-8 drop-shadow-lg"
-      >
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" className="w-full h-full max-w-md drop-shadow-2xl">
+  <defs>
+    {/* Animated Moving Gradient */}
+    <linearGradient id="avcGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#f98f46">
+        <animate attributeName="stop-color" values="#f98f46; #d96c16; #b05611; #f98f46" dur="3s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="50%" stopColor="#d96c16">
+        <animate attributeName="stop-color" values="#d96c16; #b05611; #f98f46; #d96c16" dur="3s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="100%" stopColor="#b05611">
+        <animate attributeName="stop-color" values="#b05611; #f98f46; #d96c16; #b05611" dur="3s" repeatCount="indefinite" />
+      </stop>
+    </linearGradient>
+  </defs>
 
-        {/* Video Camera Outline */}
-        <path
-          d="M 18 35 C 18 31 21 28 25 28 L 65 28 C 69 28 72 31 72 35 L 72 65 C 72 69 69 72 65 72 L 25 72 C 21 72 18 69 18 65 Z"
-          fill="#0a0710"
-          stroke="#f27e20"
-          strokeOpacity="0.4"
-          strokeWidth="2"
-        />
-        <path
-          d="M 72 45 L 86 36 C 88 34 90 36 90 38 L 90 62 C 90 64 88 66 86 64 L 72 55"
-          fill="#0a0710"
-          stroke="#f27e20"
-          strokeOpacity="0.4"
-          strokeWidth="2"
-          strokeLinejoin="round"
-        />
+  {/* Dark Theme Background */}
+  <rect width="500" height="500" rx="100" fill="#120e1a" />
 
-        {/* Text "AG" */}
-        <text x="30" y="59" fontFamily="sans-serif" fontSize="100" fontWeight="900" textAnchor="end" fill="#ffffff" letterSpacing="-2">A</text>
-        <text x="40" y="59" fontFamily="sans-serif" fontSize="100" fontWeight="900" textAnchor="start" fill="#f27e20" letterSpacing="-2">V</text>
+  {/* Rotating Tech Ring */}
+  <circle cx="250" cy="250" r="210" fill="none" stroke="url(#avcGradient)" strokeWidth="6" strokeDasharray="15 20">
+     <animateTransform attributeName="transform" type="rotate" from="0 250 250" to="360 250 250" dur="20s" repeatCount="indefinite" />
+  </circle>
 
-        {/* Little Red Recording Dot */}
-        <circle cx="26" cy="36" r="3" fill="#ef4444" />
-      </svg>
+  {/* Large, Bold AVC Text */}
+  <text x="250" y="210" fontFamily="system-ui, sans-serif" fontSize="500" fontWeight="900" fill="url(#avcGradient)" textAnchor="middle" letterSpacing="4">
+    AVC
+  </text>
+
+  {/* Video Camera Icon */}
+  <g fill="url(#avcGradient)" transform="translate(198, 250) scale(1.6)">
+    <rect x="0" y="10" width="40" height="30" rx="8" />
+    <path d="M45 20 L60 10 C62 8 65 10 65 13 L65 37 C65 40 62 42 60 40 L45 30 Z" />
+  </g>
+</svg>

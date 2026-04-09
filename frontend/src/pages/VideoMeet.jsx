@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast';
 import io from "socket.io-client";
 import { useAuth } from '../context/AuthContext';
+import { useHistory } from '../context/HistoryContext';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -23,6 +24,10 @@ const VideoMeet = () => {
 
 
   const { toastStyle } = useAuth();
+  const { addToHistory, updateHistoryDuration } = useHistory();
+
+  const meetingStartTimeRef = useRef(null);
+  const meetingIdInDbRef = useRef(null);
 
   var socketRef = useRef();
   let socketIdRef = useRef();
@@ -305,10 +310,11 @@ const VideoMeet = () => {
       socketRef.current.emit('join-call', window.location.href)
       socketIdRef.current = socketRef.current.id
 
-      socketRef.current.on('chat-message', addMessage)
-
-      socketRef.current.on('user-left', (id) => {
-        setVideos((videos) => videos.filter((video) => video.socketId !== id))
+      // Meeting History Tracking Setup
+      const code = window.location.href.split('/').pop();
+      meetingStartTimeRef.current = Date.now();
+      addToHistory(code).then(mId => {
+          if (mId) meetingIdInDbRef.current = mId;
       })
 
       socketRef.current.on('user-joined', (id, clients) => {
@@ -490,13 +496,43 @@ const VideoMeet = () => {
     setScreen(!screen);
   }
 
-  let handleEndCall = () => {
+  let handleEndCall = async () => {
     try {
       let tracks = localVideoref.current.srcObject.getTracks()
       tracks.forEach(track => track.stop())
-    } catch (e) { }
+    } catch (e) {
+      console.log(e)
+    }
+    if (meetingStartTimeRef.current && meetingIdInDbRef.current) {
+      const endTime = Date.now();
+      const elapsedMilliseconds = endTime - meetingStartTimeRef.current;
+      const durationInSeconds = Math.floor(elapsedMilliseconds / 1000);
+      try {
+        await updateHistoryDuration(meetingIdInDbRef.current, durationInSeconds);
+      } catch (err) {}
+      meetingIdInDbRef.current = null;
+      meetingStartTimeRef.current = null;
+    }
     navigate('/home');
   }
+
+  useEffect(() => {
+    const handleUnload = () => {
+       if (meetingStartTimeRef.current && meetingIdInDbRef.current) {
+          const endTime = Date.now();
+          const elapsedMilliseconds = endTime - meetingStartTimeRef.current;
+          const durationInSeconds = Math.floor(elapsedMilliseconds / 1000);
+          updateHistoryDuration(meetingIdInDbRef.current, durationInSeconds);
+          meetingIdInDbRef.current = null;
+       }
+    };
+    
+    window.addEventListener("beforeunload", handleUnload);
+    return () => {
+      handleUnload();
+      window.removeEventListener("beforeunload", handleUnload);
+    };
+  }, []);
 
   let openChat = () => {
     setModal(true);
@@ -701,13 +737,13 @@ const VideoMeet = () => {
                   const isMe = item.sender === username;
                   return (
                     <div className={`flex w-full ${isMe ? 'justify-end' : 'justify-start'}`} key={index}>
-                      <div className={`max-w-[75%] px-4 py-2 shadow-sm ${isMe ? 'bg-[#f27e20] text-white rounded-2xl rounded-tr-sm' : 'bg-white/10 border border-white/10 text-white rounded-2xl rounded-tl-sm'}`}>
-                        <p className="text-[15px] leading-relaxed wrap-break-words">{item.data}</p>
+                      <div className={`max-w-[85%] px-4 py-2 shadow-sm ${isMe ? 'bg-[#f27e20] text-white rounded-2xl rounded-tr-sm' : 'bg-white/10 border border-white/10 text-white rounded-2xl rounded-tl-sm'}`}>
+                        <p className="text-[15px] leading-relaxed break-all sm:wrap-break-words whitespace-pre-wrap">{item.data}</p>
                       </div>
                     </div>
                   )
                 }) : (
-                  <div className="h-full flex items-center justify-center text-gray-500">
+                  <div className="h-full overflow-auto flex items-center justify-center text-gray-500">
                     <p>No Messages Yet</p>
                   </div>
                 )}

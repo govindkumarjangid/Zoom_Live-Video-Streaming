@@ -11,7 +11,7 @@ const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
-        <header className="relative z-50 w-full flex items-center justify-between px-4 sm:px-8 md:px-16 py-4 md:py-6 shrink-0">
+        <header className="fixed z-50 w-full flex items-center justify-between px-4 sm:px-8 md:px-16 py-4 md:py-6 shrink-0 bg-[#050308]/80 border-b border-gray-900/20 backdrop-blur-lg">
             <motion.div
                 initial={{ opacity: 0, y: -50, blur: "10px" }}
                 animate={{ opacity: 1, y: 0, blur: "0px" }}

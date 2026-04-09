@@ -3,7 +3,7 @@
 body{
     font-family: 'Inter', sans-serif;
     background-color: #050308;
-    color: #f27e20;
+    overflow: hidden;
 }
 
 /* Custom Scrollbar Styling */

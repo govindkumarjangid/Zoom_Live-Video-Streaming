@@ -1,34 +1,29 @@
 import { useState } from 'react'
 import WithAuth from '../utils/WithAuth.jsx';
 import { useNavigate } from 'react-router-dom';
-import { Clock, LogOut, Menu, X } from 'lucide-react';
+import { Clock, LogOut, Menu, X, Loader } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BgGlowingEffect from '../components/BgGlowingEffect';
 import { useHistory } from '../context/HistoryContext.jsx';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const Home = () => {
 
   const [meetingCode, setMeetingCode] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isStartingNew, setIsStartingNew] = useState(false);
 
   const navigate = useNavigate();
 
   const { addToHistory } = useHistory();
+  const { toastStyle } = useAuth();
 
   let handleJoinVideoCall = async () => {
     if (!meetingCode.trim()) {
-      toast.error('Please enter a meeting code to join', {
-        style: {
-            borderRadius: '10px',
-            background: '#120E1A',
-            color: '#f1f2f3',
-            border: '1px solid #f27e20',
-        },
-      });
+      toast.error('Please enter a meeting code to join', toastStyle);
       return;
     }
-    await addToHistory(meetingCode);
     navigate(`/${meetingCode}`);
   }
 
@@ -36,6 +31,7 @@ const Home = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/authentication");
+    toast.success('Logged out successfully', toastStyle);
   }
 
   return (
@@ -82,8 +78,8 @@ const Home = () => {
           className="md:hidden flex items-center"
         >
           <button
-             onClick={() => setIsMenuOpen(!isMenuOpen)}
-             className="text-gray-300 hover:text-white focus:outline-none transition-colors z-50 cursor-pointer"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="text-gray-300 hover:text-white focus:outline-none transition-colors z-50 cursor-pointer"
           >
             {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
@@ -98,14 +94,14 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="absolute h-screen w-full z-40 bg-[#050308]/95 backdrop-blur-xl flex flex-col items-center justify-center gap-8 md:hidden"
+            className="absolute h-screen w-full z-40 bg-[#050308]/60 backdrop-blur-xl flex flex-col items-center justify-center gap-8 md:hidden"
           >
             <button
               onClick={() => {
                 setIsMenuOpen(false);
                 navigate('/history');
               }}
-              className="flex items-center gap-3 text-2xl text-gray-200 hover:text-[#f27e20] transition-colors"
+              className="flex items-center gap-3 text-2xl text-gray-200 hover:text-[#f27e20] transition-all cursor-pointer active:scale-95"
             >
               <Clock size={28} />
               History
@@ -116,7 +112,7 @@ const Home = () => {
                 setIsMenuOpen(false);
                 handleLogout();
               }}
-              className="flex items-center gap-3 text-2xl text-gray-200 hover:text-red-500 transition-colors"
+              className="flex items-center gap-3 text-2xl text-gray-200 hover:text-red-500 transition-all cursor-pointer active:scale-95"
             >
               <LogOut size={28} />
               Logout
@@ -166,13 +162,27 @@ const Home = () => {
             </div>
 
             <button
-                onClick={async () => {
+              onClick={async () => {
+                try {
+                  setIsStartingNew(true);
                   const newCode = Math.random().toString(36).substring(2, 9) + "-" + Math.random().toString(36).substring(2, 9);
-                  await addToHistory(newCode);
                   navigate(`/${newCode}`);
-                }}
-                className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium px-8 py-3 rounded-md transition-all duration-100 hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
-                Start New Meeting
+                } catch (error) {
+                  console.error(error);
+                } finally {
+                  setIsStartingNew(false);
+                }
+              }}
+              disabled={isStartingNew}
+              className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium px-8 py-3 rounded-md transition-all duration-100 hover:scale-[1.02] active:scale-[0.98] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed">
+              {isStartingNew ? (
+                <>
+                  <Loader size={20} className="animate-spin text-white" />
+                  Starting...
+                </>
+              ) : (
+                'Start New Meeting'
+              )}
             </button>
           </motion.div>
         </div>

@@ -53,7 +53,7 @@ const Authentication = () => {
     }
 
     return (
-        <div className="min-h-screen w-full flex bg-[#050308] text-white overflow-y-hidden relative">
+        <div className="min-h-screen w-full flex bg-[#050308] text-white overflow-y-auto md:overflow-hidden relative">
 
             {/* Left Side: Image */}
 
@@ -84,7 +84,7 @@ const Authentication = () => {
             </div>
 
             {/* Right Side: Form */}
-            <div className="w-full md:w-1/2 flex items-center justify-center p-8 sm:p-12 relative overflow-hidden">
+            <div className="w-full md:w-1/2 flex items-start sm:items-center justify-center p-6 sm:p-12 relative overflow-hidden pt-12 sm:pt-12">
 
                 {/* Background Glows matching the Hero theme */}
                 <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-[radial-gradient(circle,rgba(120,60,210,0.15)_0%,transparent_80%)] pointer-events-none" />
@@ -97,18 +97,18 @@ const Authentication = () => {
                     className="w-full max-w-md relative z-10"
                 >
                     {/* Header */}
-                    <div className="mb-10 text-center md:text-left">
-                        <div className="flex items-center justify-between gap-4 mb-8">
+                    <div className="mb-10 text-left">
+                        <div className="flex items-center justify-between w-full md:mb-8 mb-15" >
                             <motion.button
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.5 }}
                                 onClick={() => naviagte('/')}
-                                className="flex items-center justify-center p-2 rounded-full bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 text-gray-300 hover:text-white transition-all cursor-pointer"
+                                className="flex items-center justify-center p-2.5 rounded-full bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 text-gray-300 hover:text-white transition-all cursor-pointer active:scale-95"
                             >
-                                <ArrowLeft size={20} />
+                                <ArrowLeft size={22} />
                             </motion.button>
-                            <Link to="/" className="text-[#f27e20] text-2xl font-bold tracking-wide hover:text-white transition-colors">
+                            <Link to="/" className="text-[#f27e20] text-xl sm:text-2xl font-bold tracking-wide hover:text-white transition-colors text-right">
                                 Apna Video Call
                             </Link>
                         </div>

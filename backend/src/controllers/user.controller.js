@@ -86,8 +86,27 @@ export const addToHistory = asyncHandler(async (req, res) => {
 
         await newMeeting.save();
 
-        res.status(201).json({ message: 'Meeting added successfully' });
+        res.status(201).json({ message: 'Meeting added successfully', meetingId: newMeeting._id });
     } catch (error) {
         res.status(500).json({ message: 'Error adding meeting to history', error: error.message });
+    }
+});
+
+export const updateActivity = asyncHandler(async (req, res) => {
+    try {
+        const { meetingId, duration } = req.body;
+        const user = req.user;
+
+        const meeting = await Meeting.findOne({ _id: meetingId, userId: user._id });
+        if (!meeting) {
+            return res.status(404).json({ message: 'Meeting not found' });
+        }
+
+        meeting.duration = duration;
+        await meeting.save();
+
+        res.status(200).json({ message: 'Meeting updated successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating meeting history', error: error.message });
     }
 });

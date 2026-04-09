@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Video, Calendar, Clock, ChevronDown } from 'lucide-react';
@@ -24,6 +24,15 @@ const History = () => {
     const formatTime = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    const formatDuration = (seconds) => {
+        if (!seconds && seconds !== 0) return '0 min';
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        if (mins > 0 && secs > 0) return `${mins}m ${secs}s`;
+        if (mins > 0) return `${mins}m`;
+        return `${secs}s`;
     }
 
     const handleLoadMore = () => {
@@ -98,6 +107,11 @@ const History = () => {
                                                 <Clock size={14} />
                                                 {formatTime(meeting.createdAt || meeting.date)}
                                             </span>
+                                            {meeting.duration !== undefined && (
+                                              <span className="flex items-center gap-1 bg-[#f27e20]/10 text-[#f27e20] px-2 py-0.5 rounded-full text-xs font-medium ml-1">
+                                                  Dur: {formatDuration(meeting.duration)}
+                                              </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

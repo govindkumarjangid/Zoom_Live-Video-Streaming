@@ -7,12 +7,13 @@ const HistoryContext = React.createContext();
 export const HistoryProvider = ({ children }) => {
     const [history, setHistory] = React.useState([]);
 
+
     const toastStyle = {
         style: {
             borderRadius: '10px',
-            background: '#0F0C17',
+            background: '#120E1A',
             color: '#f1f2f3',
-            border: '1px solid #f27e20',
+            border: '1px solid #999999',
         },
     }
 
@@ -37,18 +38,31 @@ export const HistoryProvider = ({ children }) => {
                 meeting_code
             });
             console.log(data.message)
-            toast.success(data.message, toastStyle);
+            return data.meetingId;
         } catch (error) {
-            toast.error(error.response.data.message || 'Failed to add to history', toastStyle);
+            toast.error('Failed to add to history', error);
+            return null;
         }
     }
 
+    const updateHistoryDuration = async (meetingId, duration) => {
+        try {
+            await axiosInstance.post('/users/update_activity', {
+                token: localStorage.getItem('token'),
+                meetingId,
+                duration
+            });
+        } catch (error) {
+            toast.error('Failed to update history', error);
+        }
+    }
 
     const historyValue = {
         history,
         setHistory,
         getHistory,
-        addToHistory
+        addToHistory,
+        updateHistoryDuration
     };
 
     return (
