@@ -316,7 +316,7 @@ const VideoMeet = () => {
       const code = window.location.href.split('/').pop();
       meetingStartTimeRef.current = Date.now();
       addToHistory(code).then(mId => {
-          if (mId) meetingIdInDbRef.current = mId;
+        if (mId) meetingIdInDbRef.current = mId;
       })
 
       socketRef.current.on('user-left', (id) => {
@@ -515,7 +515,7 @@ const VideoMeet = () => {
       const durationInSeconds = Math.floor(elapsedMilliseconds / 1000);
       try {
         await updateHistoryDuration(meetingIdInDbRef.current, durationInSeconds);
-      } catch (err) {}
+      } catch (err) { }
       meetingIdInDbRef.current = null;
       meetingStartTimeRef.current = null;
     }
@@ -524,13 +524,13 @@ const VideoMeet = () => {
 
   useEffect(() => {
     const handleUnload = () => {
-       if (meetingStartTimeRef.current && meetingIdInDbRef.current) {
-          const endTime = Date.now();
-          const elapsedMilliseconds = endTime - meetingStartTimeRef.current;
-          const durationInSeconds = Math.floor(elapsedMilliseconds / 1000);
-          updateHistoryDuration(meetingIdInDbRef.current, durationInSeconds);
-          meetingIdInDbRef.current = null;
-       }
+      if (meetingStartTimeRef.current && meetingIdInDbRef.current) {
+        const endTime = Date.now();
+        const elapsedMilliseconds = endTime - meetingStartTimeRef.current;
+        const durationInSeconds = Math.floor(elapsedMilliseconds / 1000);
+        updateHistoryDuration(meetingIdInDbRef.current, durationInSeconds);
+        meetingIdInDbRef.current = null;
+      }
     };
 
     window.addEventListener("beforeunload", handleUnload);
@@ -733,7 +733,7 @@ const VideoMeet = () => {
             >
               <div className="p-4 border-b border-white/10 flex justify-between items-center">
                 <h2 className="text-xl font-semibold text-white">Chat</h2>
-                <button onClick={closeChat} className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white cursor-pointer">
+                <button onClick={showModal ? closeChat : openChat} className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white cursor-pointer">
                   <X size={20} />
                 </button>
               </div>
@@ -779,43 +779,43 @@ const VideoMeet = () => {
 
 
             {/* Bottom Controls */}
-            <div className="h-auto py-4 min-h-20 bg-[#120e1a]/80 backdrop-blur-xl border-t border-white/10 flex flex-wrap items-center justify-center gap-3 sm:gap-4 px-4 sm:px-6 relative z-20">
+            <div className="h-auto py-3 md:py-4 min-h-16 md:min-h-20 bg-[#120e1a]/80 backdrop-blur-xl border-t border-white/10 flex flex-wrap items-center justify-center gap-2 sm:gap-4 px-2 sm:px-6 relative z-20">
               <button
                 onClick={handleAudio}
-                className={`p-3 rounded-full transition-colors flex items-center justify-center border cursor-pointer ${audio ? 'bg-white/10 hover:bg-white/20 border-white/10' : 'bg-red-500/20 hover:bg-red-500/30 border-red-500/50 text-red-500'}`}
+                className={`p-2.5 md:p-3 rounded-full transition-colors flex items-center justify-center border cursor-pointer ${audio ? 'bg-white/10 hover:bg-white/20 border-white/10' : 'bg-red-500/20 hover:bg-red-500/30 border-red-500/50 text-red-500'}`}
               >
-                {audio ? <Mic size={24} /> : <MicOff size={24} />}
+                {audio ? <Mic className="w-5 h-5 md:w-6 md:h-6" /> : <MicOff className="w-5 h-5 md:w-6 md:h-6" />}
               </button>
 
               <button
                 onClick={handleVideo}
-                className={`p-3 rounded-full transition-colors flex items-center justify-center border cursor-pointer ${video ? 'bg-white/10 hover:bg-white/20 border-white/10' : 'bg-red-500/20 hover:bg-red-500/30 border-red-500/50 text-red-500'}`}
+                className={`p-2.5 md:p-3 rounded-full transition-colors flex items-center justify-center border cursor-pointer ${video ? 'bg-white/10 hover:bg-white/20 border-white/10' : 'bg-red-500/20 hover:bg-red-500/30 border-red-500/50 text-red-500'}`}
               >
-                {video ? <Video size={24} /> : <VideoOff size={24} />}
+                {video ? <Video className="w-5 h-5 md:w-6 md:h-6" /> : <VideoOff className="w-5 h-5 md:w-6 md:h-6" />}
               </button>
 
               {screenAvailable && (
                 <button
                   onClick={handleScreen}
-                  className={`p-3 rounded-full transition-colors flex items-center justify-center border cursor-pointer ${screen ? 'bg-blue-500/20 hover:bg-blue-500/30 border-blue-500/50 text-blue-400' : 'bg-white/10 hover:bg-white/20 border-white/10'}`}
+                  className={`p-2.5 md:p-3 rounded-full transition-colors flex items-center justify-center border cursor-pointer ${screen ? 'bg-blue-500/20 hover:bg-blue-500/30 border-blue-500/50 text-blue-400' : 'bg-white/10 hover:bg-white/20 border-white/10'}`}
                 >
-                  {screen ? <MonitorOff size={24} /> : <MonitorUp size={24} />}
+                  {screen ? <MonitorOff className="w-5 h-5 md:w-6 md:h-6" /> : <MonitorUp className="w-5 h-5 md:w-6 md:h-6" />}
                 </button>
               )}
 
               <button
                 onClick={handleEndCall}
-                className="p-3 mx-4 rounded-full bg-red-600 hover:bg-red-700 transition-colors flex items-center justify-center shadow-[0_0_15px_rgba(220,38,38,0.5)] cursor-pointer"
+                className="p-2.5 md:p-3 mx-2 md:mx-4 rounded-full bg-red-600 hover:bg-red-700 transition-colors flex items-center justify-center shadow-[0_0_15px_rgba(220,38,38,0.5)] cursor-pointer"
               >
-                <PhoneOff size={24} />
+                <PhoneOff className="w-5 h-5 md:w-6 md:h-6" />
               </button>
 
               <div className="relative ml-auto sm:ml-0">
                 <button
                   onClick={showModal ? closeChat : openChat}
-                  className={`p-3 rounded-full transition-colors flex items-center justify-center border cursor-pointer ${showModal ? 'bg-orange-500/20 border-orange-500/50 text-orange-400' : 'bg-white/10 hover:bg-white/20 border-white/10'}`}
+                  className={`p-2.5 md:p-3 rounded-full transition-colors flex items-center justify-center border cursor-pointer ${showModal ? 'bg-orange-500/20 border-orange-500/50 text-orange-400' : 'bg-white/10 hover:bg-white/20 border-white/10'}`}
                 >
-                  <MessageSquare size={24} />
+                  <MessageSquare className="w-5 h-5 md:w-6 md:h-6" />
                   {newMessages > 0 && !showModal && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold border-2 border-[#120e1a]">
                       {newMessages > 99 ? '99+' : newMessages}
