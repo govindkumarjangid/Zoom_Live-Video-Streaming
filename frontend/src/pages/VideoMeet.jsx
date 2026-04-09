@@ -307,14 +307,20 @@ const VideoMeet = () => {
     socketRef.current.on('signal', gotMessageFromServer)
 
     socketRef.current.on('connect', () => {
-      socketRef.current.emit('join-call', window.location.href)
+      socketRef.current.emit('join-call', window.location.href.split('/').pop())
       socketIdRef.current = socketRef.current.id
+
+      socketRef.current.on('chat-message', addMessage)
 
       // Meeting History Tracking Setup
       const code = window.location.href.split('/').pop();
       meetingStartTimeRef.current = Date.now();
       addToHistory(code).then(mId => {
           if (mId) meetingIdInDbRef.current = mId;
+      })
+
+      socketRef.current.on('user-left', (id) => {
+        setVideos((videos) => videos.filter((video) => video.socketId !== id))
       })
 
       socketRef.current.on('user-joined', (id, clients) => {
@@ -526,7 +532,7 @@ const VideoMeet = () => {
           meetingIdInDbRef.current = null;
        }
     };
-    
+
     window.addEventListener("beforeunload", handleUnload);
     return () => {
       handleUnload();
