@@ -4,12 +4,12 @@
 A full-stack web application designed for real-time video meetings and streaming. Connect with users securely, create or join live video rooms, and keep track of your active meetings and history.
 
 ## Key Features
-- ��� **User Authentication**: Secure login and registration flows.
-- ��� **Live Video & Audio**: Real-time peer-to-peer communication using WebRTC or Socket.io.
-- ��� **Video Meetings**: Instantly create or join interactive video meetings.
-- ��� **Meeting History**: Track, view, and manage previously attended or hosted meetings.
-- ���️ **Protected Navigation**: Route guarding and authentication state management.
-- ✨ **Interactive UI**: A modern, responsive user interface with dynamic components (e.g., `BgGlowingEffect`).
+-  **User Authentication**: Secure login and registration flows.
+-  **Live Video & Audio**: Real-time peer-to-peer communication using WebRTC or Socket.io.
+-  **Video Meetings**: Instantly create or join interactive video meetings.
+-  **Meeting History**: Track, view, and manage previously attended or hosted meetings.
+-  **Protected Navigation**: Route guarding and authentication state management.
+-  **Interactive UI**: A modern, responsive user interface with dynamic components (e.g., `BgGlowingEffect`).
 
 ## Tech Stack
 
